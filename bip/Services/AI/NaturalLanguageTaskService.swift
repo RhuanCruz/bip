@@ -71,6 +71,10 @@ struct NaturalLanguageTaskService {
         task.subtasks = subtasks
         modelContext.insert(task)
         subtasks.forEach { modelContext.insert($0) }
+
+        _Concurrency.Task {
+            await TaskNotificationScheduler.scheduleIfNeeded(for: task)
+        }
     }
 
     private func update(
@@ -98,6 +102,10 @@ struct NaturalLanguageTaskService {
         applyRecurrence(item.recurrence, to: task, modelContext: modelContext)
         applyReminder(item.reminder, to: task, modelContext: modelContext)
         mergeSubtasks(item.subtasks, into: task, scheduledAt: scheduledAt, category: category, modelContext: modelContext)
+
+        _Concurrency.Task {
+            await TaskNotificationScheduler.scheduleIfNeeded(for: task)
+        }
     }
 
     private func parsingContext(selectedDate: Date, parentTask: Task?, existingTasks: [Task]) -> IntentParsingContext {
@@ -168,7 +176,13 @@ struct NaturalLanguageTaskService {
     }
 
     private func applyReminder(_ reminder: ParsedReminder?, to task: Task, modelContext: ModelContext) {
-        guard let reminder, reminder.enabled else { return }
+        guard let reminder, reminder.enabled else {
+            if let existingReminder = task.reminder {
+                existingReminder.enabled = false
+            }
+            TaskNotificationScheduler.cancel(for: task)
+            return
+        }
 
         let model = task.reminder ?? Reminder()
         model.enabled = true

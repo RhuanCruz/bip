@@ -8,12 +8,6 @@ struct TaskRowView: View {
     var body: some View {
         HStack(alignment: .center, spacing: BIPSpacing.medium) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(categoryPrefix)
-                    .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(BIPTheme.muted)
-                    .lineLimit(1)
-                    .frame(width: 20, alignment: .leading)
-
                 CategoryIconView(category: task.category, size: 22)
             }
 

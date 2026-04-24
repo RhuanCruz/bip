@@ -5,6 +5,7 @@ struct BIPBottomComposer: View {
     @Binding var isVoiceModeActive: Bool
     @StateObject private var voiceInput = VoiceInputMonitor()
 
+    let didCompleteProcessing: Bool
     let isProcessing: Bool
     let placeholder: String
     let contextTask: Task?
@@ -45,6 +46,18 @@ struct BIPBottomComposer: View {
                         }
                         .transition(.opacity.combined(with: .scale(scale: 0.98)))
                         .accessibilityLabel("Processing input")
+                    } else if didCompleteProcessing {
+                        HStack(spacing: BIPSpacing.small) {
+                            Image(systemName: "checkmark.circle.fill")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(BIPTheme.success)
+
+                            Text("Done")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(BIPTheme.success)
+                        }
+                        .transition(.opacity.combined(with: .scale(scale: 0.98)))
+                        .accessibilityLabel("Input processed")
                     } else if voiceInput.isRecording {
                         VoiceWaveformView(levels: voiceInput.levels)
                             .transition(.opacity.combined(with: .scale(scale: 0.96)))
@@ -61,7 +74,7 @@ struct BIPBottomComposer: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Button(action: voiceInput.isRecording ? sendVoiceInput : startVoiceInput) {
+                Button(action: trailingAction) {
                     trailingActionIcon
                 }
                 .buttonStyle(.plain)
@@ -80,6 +93,7 @@ struct BIPBottomComposer: View {
         .animation(.snappy(duration: 0.22), value: contextTask?.id)
         .animation(.snappy(duration: 0.18), value: voiceInput.isRecording)
         .animation(.snappy(duration: 0.18), value: isProcessing)
+        .animation(.snappy(duration: 0.18), value: didCompleteProcessing)
         .onChange(of: voiceInput.isRecording) { _, isRecording in
             isVoiceModeActive = isRecording
         }
@@ -90,7 +104,13 @@ struct BIPBottomComposer: View {
 
     @ViewBuilder
     private var trailingActionIcon: some View {
-        if voiceInput.isRecording {
+        if didCompleteProcessing {
+            Image(systemName: "checkmark")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(Color.white)
+                .frame(width: 36, height: 36)
+                .background(BIPTheme.success, in: Circle())
+        } else if voiceInput.isRecording || hasText {
             Image(systemName: "arrow.up")
                 .font(.system(size: 18, weight: .bold))
                 .foregroundStyle(Color.white)
@@ -101,6 +121,20 @@ struct BIPBottomComposer: View {
                 .font(.system(size: 24, weight: .medium))
                 .foregroundStyle(BIPTheme.textPrimary)
                 .frame(width: 36, height: 36)
+        }
+    }
+
+    private var hasText: Bool {
+        !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private func trailingAction() {
+        if voiceInput.isRecording {
+            sendVoiceInput()
+        } else if hasText {
+            onSubmit()
+        } else {
+            startVoiceInput()
         }
     }
 
@@ -178,6 +212,6 @@ private extension View {
     @Previewable @State var voice = false
     let category = Category(name: "Home", colorHex: "#A0A0A0", symbolName: "house")
     let task = Task(title: "Sair com os cachorros", category: category)
-    BIPBottomComposer(text: $text, isVoiceModeActive: $voice, isProcessing: false, placeholder: "Add tasks in plain english", contextTask: task, showsContextBar: true, onSubmit: {}, onVoiceSubmit: { _ in }, onClearContext: {})
+    BIPBottomComposer(text: $text, isVoiceModeActive: $voice, didCompleteProcessing: false, isProcessing: false, placeholder: "Add tasks in plain english", contextTask: task, showsContextBar: true, onSubmit: {}, onVoiceSubmit: { _ in }, onClearContext: {})
         .background(BIPTheme.background)
 }

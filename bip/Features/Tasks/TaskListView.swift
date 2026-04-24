@@ -51,6 +51,7 @@ struct TaskListView: View {
                 }
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button(role: .destructive) {
+                        TaskNotificationScheduler.cancel(for: task)
                         modelContext.delete(task)
                     } label: {
                         Label("Delete", systemImage: "trash")

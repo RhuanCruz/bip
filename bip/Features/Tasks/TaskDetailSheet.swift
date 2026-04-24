@@ -53,6 +53,7 @@ struct TaskDetailSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(role: .destructive) {
+                        TaskNotificationScheduler.cancel(for: task)
                         modelContext.delete(task)
                         dismiss()
                     } label: {
@@ -261,6 +262,10 @@ struct TaskDetailSheet: View {
         reminder.task = task
         task.reminder = reminder
         modelContext.insert(reminder)
+
+        _Concurrency.Task {
+            await TaskNotificationScheduler.scheduleIfNeeded(for: task)
+        }
     }
 
     private var durationText: String {

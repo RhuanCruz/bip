@@ -13,6 +13,7 @@ struct RootView: View {
     @State private var composerText: String = ""
     @State private var isVoiceModeActive: Bool = false
     @State private var isProcessingNaturalLanguage: Bool = false
+    @State private var didCompleteNaturalLanguageProcessing: Bool = false
 
     var body: some View {
         ZStack {
@@ -48,6 +49,7 @@ struct RootView: View {
                 BIPBottomComposer(
                     text: $composerText,
                     isVoiceModeActive: $isVoiceModeActive,
+                    didCompleteProcessing: didCompleteNaturalLanguageProcessing,
                     isProcessing: isProcessingNaturalLanguage,
                     placeholder: activeView == .calendar ? "Add event in plain english..." : "Add tasks in plain english",
                     contextTask: swipeContext,
@@ -119,6 +121,7 @@ struct RootView: View {
     }
 
     private func processNaturalLanguageInput(_ input: ParsedIntentInput) {
+        didCompleteNaturalLanguageProcessing = false
         isProcessingNaturalLanguage = true
 
         let selectedDateSnapshot = selectedDate
@@ -144,6 +147,7 @@ struct RootView: View {
                 if parentTaskSnapshot != nil {
                     swipeContext = nil
                 }
+                showProcessingSuccess()
             } catch {
                 print("Natural language processing failed: \(error)")
             }
@@ -151,6 +155,14 @@ struct RootView: View {
             if case .audio(let fileURL, _) = input {
                 try? FileManager.default.removeItem(at: fileURL)
             }
+        }
+    }
+
+    private func showProcessingSuccess() {
+        didCompleteNaturalLanguageProcessing = true
+        _Concurrency.Task {
+            try? await _Concurrency.Task.sleep(for: .seconds(1.1))
+            didCompleteNaturalLanguageProcessing = false
         }
     }
 

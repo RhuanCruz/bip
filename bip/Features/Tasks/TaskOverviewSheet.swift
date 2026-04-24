@@ -13,6 +13,7 @@ struct TaskOverviewSheet: View {
     @State private var agentText = ""
     @State private var isVoiceModeActive = false
     @State private var isProcessingAgentInput = false
+    @State private var didCompleteAgentInput = false
 
     var body: some View {
         NavigationStack {
@@ -31,6 +32,7 @@ struct TaskOverviewSheet: View {
                 BIPBottomComposer(
                     text: $agentText,
                     isVoiceModeActive: $isVoiceModeActive,
+                    didCompleteProcessing: didCompleteAgentInput,
                     isProcessing: isProcessingAgentInput,
                     placeholder: "Add subtasks or update this task...",
                     contextTask: task,
@@ -195,6 +197,7 @@ struct TaskOverviewSheet: View {
     }
 
     private func processAgentInput(_ input: ParsedIntentInput) {
+        didCompleteAgentInput = false
         isProcessingAgentInput = true
 
         let selectedDate = task.scheduledAt ?? Date()
@@ -217,6 +220,7 @@ struct TaskOverviewSheet: View {
                     existingTasks: tasksSnapshot,
                     modelContext: modelContextSnapshot
                 )
+                showProcessingSuccess()
             } catch {
                 print("Task overview agent processing failed: \(error)")
             }
@@ -224,6 +228,14 @@ struct TaskOverviewSheet: View {
             if case .audio(let fileURL, _) = input {
                 try? FileManager.default.removeItem(at: fileURL)
             }
+        }
+    }
+
+    private func showProcessingSuccess() {
+        didCompleteAgentInput = true
+        _Concurrency.Task {
+            try? await _Concurrency.Task.sleep(for: .seconds(1.1))
+            didCompleteAgentInput = false
         }
     }
 
