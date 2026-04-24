@@ -25,7 +25,7 @@ struct TaskDetailSheet: View {
         _assignToDay = State(initialValue: task.scheduledAt != nil)
         _scheduledAt = State(initialValue: task.scheduledAt ?? Date())
         _durationMinutes = State(initialValue: task.resolvedDurationMinutes)
-        _isRepeating = State(initialValue: task.recurrence?.type != nil && task.recurrence?.type != .none)
+        _isRepeating = State(initialValue: task.recurrence?.type != nil && task.recurrence?.type != RecurrenceType.none)
         _recurrenceType = State(initialValue: task.recurrence?.type ?? .none)
         _daysOfWeek = State(initialValue: Set(task.recurrence?.daysOfWeek ?? []))
         _reminderEnabled = State(initialValue: task.reminder?.enabled ?? false)

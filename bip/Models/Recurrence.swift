@@ -25,9 +25,9 @@ enum RecurrenceType: String, Codable, CaseIterable, Identifiable {
 
 @Model
 final class Recurrence {
-    @Attribute(.unique) var id: UUID
-    var type: RecurrenceType
-    var daysOfWeek: [Int]
+    var id: UUID = UUID()
+    var type: RecurrenceType = RecurrenceType.none
+    var daysOfWeek: [Int] = []
     var task: Task?
 
     init(

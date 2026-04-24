@@ -59,7 +59,7 @@ struct CalendarDaySection: View {
     @ViewBuilder
     private func eventCard(for task: Task) -> some View {
         let visibleSubtasks = subtasksToShow(for: task)
-        let remainingSubtasks = max(0, task.subtasks.count - visibleSubtasks.count)
+        let remainingSubtasks = max(0, task.childTasks.count - visibleSubtasks.count)
 
         HStack(alignment: .top, spacing: BIPSpacing.small) {
             CategoryIconView(category: task.category, size: 20)
@@ -112,7 +112,7 @@ struct CalendarDaySection: View {
         guard limit > 0 else { return [] }
 
         return Array(
-            task.subtasks
+            task.childTasks
                 .sorted { $0.createdAt < $1.createdAt }
                 .prefix(limit)
         )

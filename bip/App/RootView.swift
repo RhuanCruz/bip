@@ -95,7 +95,9 @@ struct RootView: View {
                 category: swipeContext.category ?? defaultCategory,
                 parentTask: swipeContext
             )
-            swipeContext.subtasks.append(subtask)
+            var subtasks = swipeContext.subtasks ?? []
+            subtasks.append(subtask)
+            swipeContext.subtasks = subtasks
             swipeContext.updatedAt = Date()
             modelContext.insert(subtask)
         } else {

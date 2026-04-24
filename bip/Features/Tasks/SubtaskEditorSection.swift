@@ -13,7 +13,7 @@ struct SubtaskEditorSection: View {
                 .foregroundStyle(BIPTheme.textSecondary)
 
             VStack(spacing: 1) {
-                ForEach(task.subtasks) { subtask in
+                ForEach(task.childTasks) { subtask in
                     SubtaskRow(subtask: subtask) {
                         modelContext.delete(subtask)
                     }
@@ -58,7 +58,9 @@ struct SubtaskEditorSection: View {
             category: task.category,
             parentTask: task
         )
-        task.subtasks.append(subtask)
+        var subtasks = task.subtasks ?? []
+        subtasks.append(subtask)
+        task.subtasks = subtasks
         task.updatedAt = Date()
         modelContext.insert(subtask)
         newSubtaskTitle = ""

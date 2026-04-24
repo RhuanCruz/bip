@@ -3,14 +3,14 @@ import SwiftData
 
 @Model
 final class Task {
-    @Attribute(.unique) var id: UUID
-    var title: String
-    var isCompleted: Bool
+    var id: UUID = UUID()
+    var title: String = ""
+    var isCompleted: Bool = false
     var scheduledAt: Date?
     var durationMinutes: Int?
-    var rawInput: String
-    var createdAt: Date
-    var updatedAt: Date
+    var rawInput: String = ""
+    var createdAt: Date = Date()
+    var updatedAt: Date = Date()
 
     var category: Category?
 
@@ -23,7 +23,7 @@ final class Task {
     var parentTask: Task?
 
     @Relationship(deleteRule: .cascade, inverse: \Task.parentTask)
-    var subtasks: [Task]
+    var subtasks: [Task]?
 
     init(
         id: UUID = UUID(),
@@ -38,7 +38,7 @@ final class Task {
         recurrence: Recurrence? = nil,
         reminder: Reminder? = nil,
         parentTask: Task? = nil,
-        subtasks: [Task] = []
+        subtasks: [Task]? = []
     ) {
         self.id = id
         self.title = title
@@ -57,5 +57,9 @@ final class Task {
 
     var resolvedDurationMinutes: Int {
         max(15, durationMinutes ?? 60)
+    }
+
+    var childTasks: [Task] {
+        subtasks ?? []
     }
 }

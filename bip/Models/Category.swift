@@ -3,13 +3,13 @@ import SwiftData
 
 @Model
 final class Category {
-    @Attribute(.unique) var id: UUID
-    var name: String
-    var colorHex: String
-    var symbolName: String
+    var id: UUID = UUID()
+    var name: String = ""
+    var colorHex: String = "#A0A0A0"
+    var symbolName: String = "tag"
 
     @Relationship(deleteRule: .nullify, inverse: \Task.category)
-    var tasks: [Task]
+    var tasks: [Task]?
 
     init(
         id: UUID = UUID(),
@@ -22,5 +22,9 @@ final class Category {
         self.colorHex = colorHex
         self.symbolName = symbolName
         self.tasks = []
+    }
+
+    var taskCount: Int {
+        tasks?.count ?? 0
     }
 }

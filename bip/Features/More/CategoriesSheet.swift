@@ -142,7 +142,7 @@ struct CategoriesSheet: View {
                                 .font(.system(size: 17, weight: .semibold))
                                 .foregroundStyle(BIPTheme.textPrimary)
 
-                            Text(category.tasks.count == 1 ? "1 task" : "\(category.tasks.count) tasks")
+                            Text(category.taskCount == 1 ? "1 task" : "\(category.taskCount) tasks")
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundStyle(BIPTheme.textSecondary)
                         }

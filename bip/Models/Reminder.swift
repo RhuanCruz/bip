@@ -3,9 +3,9 @@ import SwiftData
 
 @Model
 final class Reminder {
-    @Attribute(.unique) var id: UUID
-    var enabled: Bool
-    var offsetMinutes: Int
+    var id: UUID = UUID()
+    var enabled: Bool = false
+    var offsetMinutes: Int = 0
     var task: Task?
 
     init(
