@@ -256,6 +256,8 @@
 				DEVELOPMENT_TEAM = 8F6U896N7D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_BIPGeminiAPIKey = "$(GEMINI_API_KEY)";
+				INFOPLIST_KEY_BIPGeminiModelName = "gemini-3-flash-preview";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BIP uses the microphone to show live voice input waves while you speak.";
@@ -272,6 +274,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zurc.bip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -299,6 +302,8 @@
 				DEVELOPMENT_TEAM = 8F6U896N7D;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_BIPGeminiAPIKey = "$(GEMINI_API_KEY)";
+				INFOPLIST_KEY_BIPGeminiModelName = "gemini-3-flash-preview";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BIP uses the microphone to show live voice input waves while you speak.";
@@ -315,6 +320,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
+				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zurc.bip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

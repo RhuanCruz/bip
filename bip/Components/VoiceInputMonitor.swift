@@ -10,6 +10,7 @@ final class VoiceInputMonitor: NSObject, ObservableObject, @unchecked Sendable {
     @Published private(set) var permissionDenied = false
 
     private let sampleCount = 34
+    private var activeRecordingURL: URL?
     private var recorder: AVAudioRecorder?
     private var timer: Timer?
 
@@ -44,14 +45,29 @@ final class VoiceInputMonitor: NSObject, ObservableObject, @unchecked Sendable {
     }
 
     func stop() {
+        stopRecording(deleteFile: true)
+    }
+
+    func finishRecording() -> URL? {
+        stopRecording(deleteFile: false)
+    }
+
+    private func stopRecording(deleteFile: Bool) -> URL? {
+        let url = activeRecordingURL
         timer?.invalidate()
         timer = nil
         recorder?.stop()
         recorder = nil
+        activeRecordingURL = nil
         isRecording = false
         levels = Array(repeating: 0.12, count: sampleCount)
 
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        if deleteFile, let url {
+            try? FileManager.default.removeItem(at: url)
+        }
+
+        return url
     }
 
     private func startRecording() {
@@ -60,11 +76,15 @@ final class VoiceInputMonitor: NSObject, ObservableObject, @unchecked Sendable {
             try session.setCategory(.playAndRecord, mode: .measurement, options: [.duckOthers, .defaultToSpeaker])
             try session.setActive(true)
 
-            let recorder = try AVAudioRecorder(url: recordingURL, settings: recordingSettings)
+            let url = recordingURL
+            try? FileManager.default.removeItem(at: url)
+
+            let recorder = try AVAudioRecorder(url: url, settings: recordingSettings)
             recorder.isMeteringEnabled = true
             recorder.record()
 
             self.recorder = recorder
+            activeRecordingURL = url
             isRecording = true
             startMetering()
         } catch {
@@ -111,16 +131,16 @@ final class VoiceInputMonitor: NSObject, ObservableObject, @unchecked Sendable {
 
     private var recordingURL: URL {
         FileManager.default.temporaryDirectory
-            .appendingPathComponent("bip-voice-metering")
-            .appendingPathExtension("caf")
+            .appendingPathComponent("bip-voice-input-\(UUID().uuidString)")
+            .appendingPathExtension("aac")
     }
 
     private var recordingSettings: [String: Any] {
         [
-            AVFormatIDKey: Int(kAudioFormatAppleLossless),
+            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
             AVSampleRateKey: 44_100,
             AVNumberOfChannelsKey: 1,
-            AVEncoderAudioQualityKey: AVAudioQuality.min.rawValue,
+            AVEncoderAudioQualityKey: AVAudioQuality.medium.rawValue,
         ]
     }
 }

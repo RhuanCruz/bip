@@ -2,6 +2,7 @@ import SwiftData
 import SwiftUI
 
 struct TaskListView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \Task.createdAt) private var tasks: [Task]
 
     let selectedDate: Date
@@ -47,6 +48,13 @@ struct TaskListView: View {
                         Label("Context", systemImage: "arrow.uturn.down")
                     }
                     .tint(.gray)
+                }
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    Button(role: .destructive) {
+                        modelContext.delete(task)
+                    } label: {
+                        Label("Delete", systemImage: "trash")
+                    }
                 }
             }
         }

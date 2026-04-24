@@ -4,6 +4,7 @@ import SwiftUI
 struct RootView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Category.name) private var categories: [Category]
+    @Query(sort: \Task.scheduledAt) private var tasks: [Task]
 
     @State private var activeView: MainViewMode = .tasks
     @State private var selectedDate: Date = .now
@@ -11,6 +12,7 @@ struct RootView: View {
     @State private var swipeContext: Task?
     @State private var composerText: String = ""
     @State private var isVoiceModeActive: Bool = false
+    @State private var isProcessingNaturalLanguage: Bool = false
 
     var body: some View {
         ZStack {
@@ -46,9 +48,12 @@ struct RootView: View {
                 BIPBottomComposer(
                     text: $composerText,
                     isVoiceModeActive: $isVoiceModeActive,
+                    isProcessing: isProcessingNaturalLanguage,
                     placeholder: activeView == .calendar ? "Add event in plain english..." : "Add tasks in plain english",
                     contextTask: swipeContext,
+                    showsContextBar: true,
                     onSubmit: submitComposer,
+                    onVoiceSubmit: { submitVoiceComposer(fileURL: $0) },
                     onClearContext: { swipeContext = nil }
                 )
             }
@@ -64,12 +69,20 @@ struct RootView: View {
                     .presentationDetents([.height(620), .large])
                     .presentationDragIndicator(.visible)
             case .taskDetail(let task):
+                TaskOverviewSheet(
+                    task: task,
+                    onEdit: { activeSheet = .taskEditor(task) }
+                )
+                    .presentationDetents([.large])
+                    .presentationDragIndicator(.visible)
+            case .taskEditor(let task):
                 TaskDetailSheet(task: task)
                     .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
             case .moreMenu:
                 MoreMenuSheet(
-                    onOpenCategories: { activeSheet = .categories }
+                    onOpenCategories: { activeSheet = .categories },
+                    onOpenGeminiSettings: { activeSheet = .geminiSettings }
                 )
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
@@ -77,40 +90,68 @@ struct RootView: View {
                 CategoriesSheet()
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
+            case .geminiSettings:
+                GeminiSettingsSheet()
+                    .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
             }
         }
     }
 
     private func submitComposer() {
+        guard !isProcessingNaturalLanguage else { return }
+
         let trimmedText = composerText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmedText.isEmpty else { return }
 
-        let defaultCategory = categories.first ?? createDefaultCategory()
+        composerText = ""
+        processNaturalLanguageInput(.text(trimmedText))
+    }
 
-        if let swipeContext {
-            let subtask = Task(
-                title: trimmedText,
-                scheduledAt: swipeContext.scheduledAt,
-                rawInput: trimmedText,
-                category: swipeContext.category ?? defaultCategory,
-                parentTask: swipeContext
-            )
-            var subtasks = swipeContext.subtasks ?? []
-            subtasks.append(subtask)
-            swipeContext.subtasks = subtasks
-            swipeContext.updatedAt = Date()
-            modelContext.insert(subtask)
-        } else {
-            let task = Task(
-                title: trimmedText,
-                scheduledAt: selectedDate,
-                rawInput: trimmedText,
-                category: defaultCategory
-            )
-            modelContext.insert(task)
+    private func submitVoiceComposer(fileURL: URL) {
+        guard !isProcessingNaturalLanguage else {
+            try? FileManager.default.removeItem(at: fileURL)
+            return
         }
 
-        composerText = ""
+        isVoiceModeActive = false
+        processNaturalLanguageInput(.audio(fileURL: fileURL, mimeType: "audio/aac"))
+    }
+
+    private func processNaturalLanguageInput(_ input: ParsedIntentInput) {
+        isProcessingNaturalLanguage = true
+
+        let selectedDateSnapshot = selectedDate
+        let parentTaskSnapshot = swipeContext
+        let categoriesSnapshot = categories
+        let tasksSnapshot = tasks
+        let modelContextSnapshot = modelContext
+
+        _Concurrency.Task {
+            defer {
+                isProcessingNaturalLanguage = false
+            }
+
+            do {
+                try await NaturalLanguageTaskService().createItems(
+                    from: input,
+                    selectedDate: selectedDateSnapshot,
+                    parentTask: parentTaskSnapshot,
+                    categories: categoriesSnapshot,
+                    existingTasks: tasksSnapshot,
+                    modelContext: modelContextSnapshot
+                )
+                if parentTaskSnapshot != nil {
+                    swipeContext = nil
+                }
+            } catch {
+                print("Natural language processing failed: \(error)")
+            }
+
+            if case .audio(let fileURL, _) = input {
+                try? FileManager.default.removeItem(at: fileURL)
+            }
+        }
     }
 
     private func seedDefaultCategories() {
@@ -120,11 +161,6 @@ struct RootView: View {
         modelContext.insert(Category(name: "Studies", colorHex: "#B07A2A", symbolName: "books.vertical"))
     }
 
-    private func createDefaultCategory() -> Category {
-        let category = Category(name: "Home", colorHex: "#A0A0A0", symbolName: "house")
-        modelContext.insert(category)
-        return category
-    }
 }
 
 private struct DatePickerSheet: View {

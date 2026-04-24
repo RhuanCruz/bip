@@ -23,10 +23,21 @@ struct TaskRowView: View {
                     .foregroundStyle(BIPTheme.textPrimary)
                     .lineLimit(1)
 
-                Text(subtitle)
-                    .font(.system(size: 14))
-                    .foregroundStyle(BIPTheme.textSecondary)
-                    .lineLimit(1)
+                HStack(spacing: BIPSpacing.small) {
+                    Text(subtitle)
+                        .font(.system(size: 14))
+                        .foregroundStyle(BIPTheme.textSecondary)
+                        .lineLimit(1)
+
+                    if !task.childTasks.isEmpty {
+                        Text("\(task.childTasks.count)")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundStyle(BIPTheme.textPrimary)
+                            .padding(.horizontal, 7)
+                            .padding(.vertical, 2)
+                            .background(BIPTheme.elevated, in: Capsule())
+                    }
+                }
             }
 
             Spacer(minLength: BIPSpacing.medium)

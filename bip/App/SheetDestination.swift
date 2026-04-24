@@ -3,8 +3,10 @@ import Foundation
 enum SheetDestination: Identifiable {
     case datePicker
     case taskDetail(Task)
+    case taskEditor(Task)
     case moreMenu
     case categories
+    case geminiSettings
 
     var id: String {
         switch self {
@@ -12,10 +14,14 @@ enum SheetDestination: Identifiable {
             "datePicker"
         case .taskDetail(let task):
             "taskDetail-\(task.id.uuidString)"
+        case .taskEditor(let task):
+            "taskEditor-\(task.id.uuidString)"
         case .moreMenu:
             "moreMenu"
         case .categories:
             "categories"
+        case .geminiSettings:
+            "geminiSettings"
         }
     }
 }

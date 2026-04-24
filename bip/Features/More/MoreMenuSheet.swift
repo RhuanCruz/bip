@@ -8,6 +8,7 @@ struct MoreMenuSheet: View {
     @Query(sort: \Category.name) private var categories: [Category]
 
     let onOpenCategories: () -> Void
+    let onOpenGeminiSettings: () -> Void
 
     @State private var importState: ReminderImportState = .idle
 
@@ -20,6 +21,7 @@ struct MoreMenuSheet: View {
             MoreMenuRow(title: "Categories", systemImage: "square.grid.2x2", action: .categories),
         ]),
         MoreMenuSection(title: "Integrations", rows: [
+            MoreMenuRow(title: "Gemini API Key", systemImage: "key", action: .geminiSettings),
             MoreMenuRow(title: "Apple Reminders", systemImage: "checklist", action: .appleReminders),
         ]),
     ]
@@ -58,6 +60,8 @@ struct MoreMenuSheet: View {
         switch row.action {
         case .categories:
             onOpenCategories()
+        case .geminiSettings:
+            onOpenGeminiSettings()
         case .appleReminders:
             _Concurrency.Task<Void, Never> {
                 await importAppleReminders()
@@ -108,7 +112,7 @@ private struct MoreSectionView: View {
 
                             Spacer()
 
-                            if row.action == .categories {
+                            if row.action == .categories || row.action == .geminiSettings {
                                 Image(systemName: "chevron.right")
                                     .font(.system(size: 13, weight: .bold))
                                     .foregroundStyle(BIPTheme.textSecondary)
@@ -153,6 +157,7 @@ private struct MoreMenuRow: Identifiable {
 private enum MoreMenuAction: Equatable {
     case none
     case categories
+    case geminiSettings
     case appleReminders
 }
 
@@ -268,5 +273,5 @@ private enum ReminderImportError: LocalizedError {
 }
 
 #Preview {
-    MoreMenuSheet(onOpenCategories: {})
+    MoreMenuSheet(onOpenCategories: {}, onOpenGeminiSettings: {})
 }
