@@ -103,12 +103,7 @@ struct CalendarView: View {
     private var tasksForSelectedDate: [Task] {
         tasks
             .filter { $0.parentTask == nil }
-            .filter { task in
-                guard let scheduledAt = task.scheduledAt else {
-                    return false
-                }
-                return Foundation.Calendar.current.isDate(scheduledAt, inSameDayAs: selectedDate)
-            }
+            .filter { TaskOccurrencePolicy.occurs($0, on: selectedDate) }
             .sorted { lhs, rhs in
                 switch (lhs.scheduledAt, rhs.scheduledAt) {
                 case let (left?, right?):

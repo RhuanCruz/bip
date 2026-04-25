@@ -261,9 +261,9 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BIP uses the microphone to show live voice input waves while you speak.";
-				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "BIP sends local notifications for task reminders.";
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "BIP imports your reminders so they can appear as tasks.";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "BIP imports your reminders so they can appear as tasks.";
+				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "BIP sends local notifications for task reminders.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
@@ -308,9 +308,9 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "BIP uses the microphone to show live voice input waves while you speak.";
-				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "BIP sends local notifications for task reminders.";
 				INFOPLIST_KEY_NSRemindersFullAccessUsageDescription = "BIP imports your reminders so they can appear as tasks.";
 				INFOPLIST_KEY_NSRemindersUsageDescription = "BIP imports your reminders so they can appear as tasks.";
+				INFOPLIST_KEY_NSUserNotificationsUsageDescription = "BIP sends local notifications for task reminders.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
