@@ -7,6 +7,7 @@ enum SheetDestination: Identifiable {
     case moreMenu
     case categories
     case geminiSettings
+    case postComposer
 
     var id: String {
         switch self {
@@ -22,6 +23,8 @@ enum SheetDestination: Identifiable {
             "categories"
         case .geminiSettings:
             "geminiSettings"
+        case .postComposer:
+            "postComposer"
         }
     }
 }

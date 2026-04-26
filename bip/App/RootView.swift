@@ -42,22 +42,30 @@ struct RootView: View {
                             onOpenDatePicker: { activeSheet = .datePicker },
                             onOpenTask: { activeSheet = .taskDetail($0) }
                         )
+                    case .bip:
+                        BIPFeedView(
+                            onAddPost: { activeSheet = .postComposer }
+                        )
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                BIPBottomComposer(
-                    text: $composerText,
-                    isVoiceModeActive: $isVoiceModeActive,
-                    didCompleteProcessing: didCompleteNaturalLanguageProcessing,
-                    isProcessing: isProcessingNaturalLanguage,
-                    placeholder: activeView == .calendar ? "Add event in plain english..." : "Add tasks in plain english",
-                    contextTask: swipeContext,
-                    showsContextBar: true,
-                    onSubmit: submitComposer,
-                    onVoiceSubmit: { submitVoiceComposer(fileURL: $0) },
-                    onClearContext: { swipeContext = nil }
-                )
+                if activeView == .bip {
+                    BIPPostBar(onAddPost: { activeSheet = .postComposer })
+                } else {
+                    BIPBottomComposer(
+                        text: $composerText,
+                        isVoiceModeActive: $isVoiceModeActive,
+                        didCompleteProcessing: didCompleteNaturalLanguageProcessing,
+                        isProcessing: isProcessingNaturalLanguage,
+                        placeholder: activeView == .calendar ? "Add event in plain english..." : "Add tasks in plain english",
+                        contextTask: swipeContext,
+                        showsContextBar: true,
+                        onSubmit: submitComposer,
+                        onVoiceSubmit: { submitVoiceComposer(fileURL: $0) },
+                        onClearContext: { swipeContext = nil }
+                    )
+                }
             }
         }
         .preferredColorScheme(.dark)
@@ -95,6 +103,10 @@ struct RootView: View {
             case .geminiSettings:
                 GeminiSettingsSheet()
                     .presentationDetents([.medium, .large])
+                    .presentationDragIndicator(.visible)
+            case .postComposer:
+                BIPPostComposerSheet()
+                    .presentationDetents([.large])
                     .presentationDragIndicator(.visible)
             }
         }

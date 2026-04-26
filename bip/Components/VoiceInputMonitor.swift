@@ -45,7 +45,7 @@ final class VoiceInputMonitor: NSObject, ObservableObject, @unchecked Sendable {
     }
 
     func stop() {
-        stopRecording(deleteFile: true)
+        _ = stopRecording(deleteFile: true)
     }
 
     func finishRecording() -> URL? {

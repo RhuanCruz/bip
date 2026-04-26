@@ -23,6 +23,7 @@ struct CalendarView: View {
 
             ScrollView {
                 CalendarDaySection(
+                    selectedDate: selectedDate,
                     tasks: tasksForSelectedDate,
                     onOpenTask: onOpenTask
                 )
